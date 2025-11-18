@@ -1,4 +1,3 @@
-from re import template
 from langchain_google_genai import ChatGoogleGenerativeAI
 from pydantic_core.core_schema import ModelSchema
 from requests import models

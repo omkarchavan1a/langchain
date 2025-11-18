@@ -1,0 +1,17 @@
+{
+    "name": null,
+    "input_variables": [
+        "length_input",
+        "paper_input",
+        "style_input"
+    ],
+    "optional_variables": [],
+    "output_parser": null,
+    "partial_variables": {},
+    "metadata": null,
+    "tags": null,
+    "template": "\nResearch Paper Type: {paper_input}\nWriting Style: {style_input}\nDesired Length: {length_input}\n\nTitle: [Enter your research paper title here]\n\nAbstract:\n[Provide a concise summary of the research paper, outlining the key problem, approach, and findings.]\n\nIntroduction:\n[Introduce the background and importance of the topic, clearly state the research question or objective.]\n\nLiterature Review / Background:\n[Summarize key existing research and theories relevant to your topic. Relate past findings to your current work.]\n\nMethodology:\n[Describe the methods used for investigation, data collection, or experimentation. Explain why these methods are appropriate.]\n\nResults / Findings:\n[Present the significant results or findings of your research. Use charts, tables, or figures as needed.]\n\nDiscussion:\n[Interpret and discuss the implications of your findings. Highlight limitations, challenges, or interesting patterns.]\n\nConclusion:\n[Summarize the main points of the paper and suggest future research directions or practical applications.]\n\nReferences:\n[List the references, articles, or books cited in your paper in the appropriate format.]\n\nAppendices (if applicable):\n[Provide any supplementary materials, such as raw data, questionnaires, or additional images.]\n",
+    "template_format": "f-string",
+    "validate_template": true,
+    "_type": "prompt"
+}

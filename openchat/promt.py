@@ -1,7 +1,10 @@
+from re import template
 from langchain_google_genai import ChatGoogleGenerativeAI
+from pydantic_core.core_schema import ModelSchema
+from requests import models
 import streamlit as st
 from dotenv import load_dotenv
-from langchain_core.prompts import PromptTemplate
+from langchain_core.prompts import PromptTemplate,load_prompt
 
 load_dotenv()
 
@@ -84,69 +87,35 @@ length_input = st.selectbox(
     key="length_input",
 )
 
-
-#template
-template = PromptTemplate(
-    template = """
-Research Paper Type: {paper_input}
-Writing Style: {style_input}
-Desired Length: {length_input}
-
-Title: [Enter your research paper title here]
-
-Abstract:
-[Provide a concise summary of the research paper, outlining the key problem, approach, and findings.]
-
-Introduction:
-[Introduce the background and importance of the topic, clearly state the research question or objective.]
-
-Literature Review / Background:
-[Summarize key existing research and theories relevant to your topic. Relate past findings to your current work.]
-
-Methodology:
-[Describe the methods used for investigation, data collection, or experimentation. Explain why these methods are appropriate.]
-
-Results / Findings:
-[Present the significant results or findings of your research. Use charts, tables, or figures as needed.]
-
-Discussion:
-[Interpret and discuss the implications of your findings. Highlight limitations, challenges, or interesting patterns.]
-
-Conclusion:
-[Summarize the main points of the paper and suggest future research directions or practical applications.]
-
-References:
-[List the references, articles, or books cited in your paper in the appropriate format.]
-
-Appendices (if applicable):
-[Provide any supplementary materials, such as raw data, questionnaires, or additional images.]
- """
+template = load_prompt("template.json")
+# Generate the paper prompt by filling in the template with user inputs
+prompt = template.format(
+    paper_input=paper_input,
+    style_input=style_input,
+    length_input=length_input
 )
 
-input_variables = ["paper_input", "style_input", "length_input"]
-
-prompt = template.invoke({
-    "paper_input": paper_input,
-    "style_input": style_input,
-    "length_input": length_input
-})
-
+# Set up the language model
 llm = ChatGoogleGenerativeAI(model="models/gemini-2.5-flash", temperature=0.7)
 
-def generate_response(prompt: str) -> str:
-    message = llm.invoke(prompt)
-    if isinstance(message.content, list):
-        return "".join(part.get("text", "") for part in message.content)
-    return message.content or ""
+def generate_response(prompt_text: str) -> str:
+    """Generate a response from the LLM given a prompt string."""
+    response = llm.invoke(prompt_text)
+    # The response content can be a string or a list (for streaming outputs)
+    if isinstance(response.content, list):
+        # Concatenate all text parts if it's a list
+        return "".join(part.get("text", "") for part in response.content)
+    return response.content or ""
 
+# Button to trigger the generation
 if st.button("Generate"):
-    # Convert prompt to string before calling strip(), since it's a StringPromptValue object
     prompt_str = str(prompt)
     if not prompt_str.strip():
-        st.warning("Please select a paper type, style, and length first.")
+        st.warning("Please enter a paper type, style, and length before generating.")
     else:
-        with st.spinner("Thinking..."):
+        with st.spinner("Generating your research paper..."):
             try:
-                st.write(generate_response(prompt_str))
+                result = generate_response(prompt_str)
+                st.write(result)
             except Exception as exc:
-                st.error(f"Request failed: {exc}")
+                st.error(f"Failed to generate paper: {exc}")
